@@ -6,7 +6,7 @@
 </p>  
 <h1 align="center">Whatsapp-Group-Contacts-Scraper 👋</h1>
 <p>
-  <img alt="Version" src="https://img.shields.io/badge/version-0.1-blue.svg?cacheSeconds=2592000" />
+  <img alt="Version" src="https://img.shields.io/badge/version-2.0-blue.svg?cacheSeconds=2592000" />
   <img alt="Open Issues" src="https://img.shields.io/github/issues-raw/situmorang-com/Whatsapp-Group-Contacts-Scraper" />
   <img alt="Last Commit" src="https://img.shields.io/github/last-commit/situmorang-com/Whatsapp-Group-Contacts-Scraper" />
   <img alt="Contributors" src="https://img.shields.io/badge/all_contributors-26-orange.svg?style=flat-square" />
@@ -35,16 +35,29 @@ You can fork this project by clicking `fork button` 👉 ![GitHub forks](https:/
 ## 🚀How to use it?
 1. Open your `"Whatsapp Web"` from a browser: "https://web.whatsapp.com/"
 2. Select a `Whatsapp Group`
-3. Press `F12` or `Ctrl-Shift-I`(Windows) / `Cmd-Shift-I`(Mac) to open the browser console
-4. Paste this whole code and press `ENTER` key
-5. It will ask you to where to save your `.csv` file (It will already automatically input your Group Name as file name)
+3. Click the **group name** in the chat header to open the **Group Info** panel
+4. Click **"View all"** or the **member count** to open the full members list modal
+5. Press `F12` or `Ctrl-Shift-I`(Windows) / `Cmd-Shift-I`(Mac) to open the browser console
+6. Paste the whole code from `WA Group Contact Scraper.js` and press `ENTER`
+7. The script will **auto-scroll** through all members, extract data, and download a `.csv` file
+
+> **Note:** The script needs the full members modal to be open (not just the side panel). Look for the popup/dialog that shows all group members.
 
 Now you can open your file and find your list of contacts which specifies the following:
 The header will tell you the group name and number of contacts that it has in that group
-Column A - num : will tell you the phone number of your contacts if not already registered in your phone's contact
-Column B = name: will tell you the unlisted number's owner (name), and it will show NO_NAME if it's already listed in your contacts
-Column C = img: will give you the link for the contact's profile picture for you to download manually
-Column D = status: will give you the current status as of now from the particular contact
+- **Column A - num**: phone number of the contact (or "N/A" if not available)
+- **Column B - namenum**: phone number as shown, or "IN_CONTACTS" if already saved in your phone
+- **Column C - name**: display name of the contact
+- **Column D - img**: link to the contact's profile picture (or "No Pic")
+- **Column E - status**: current status/bio of the contact (or "NONE")
+
+## 🔄 What changed in v2.0?
+- **Stable selectors**: Uses `role="listitem"`, `role="dialog"`, `data-animate-modal-body`, `span[title][aria-label]` instead of fragile DOM traversal chains
+- **Virtual scroll support**: WhatsApp Web only renders visible members — the script now auto-scrolls to load and capture ALL members
+- **Multiple fallback strategies**: 3 different methods to find the member panel, so it works across WhatsApp Web updates
+- **async/await**: Proper asynchronous flow instead of fixed timeouts
+- **Better CSV**: Proper escaping, BOM for Excel compatibility, cleaner output
+- **Progress logging**: See live extraction progress in the console
 
 If this project has helped you please give me a "STAR" up above and help spread the news.
 
