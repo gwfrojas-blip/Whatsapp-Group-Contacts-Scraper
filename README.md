@@ -32,6 +32,14 @@ You can fork this project by clicking `fork button` 👉 ![GitHub forks](https:/
 
 
 
+## 📸 Progress Banner
+
+While the script runs, a live progress banner appears in the top-left corner of your browser showing real-time status and a progress bar:
+
+<p align="center">
+  <img src="./progress-banner.png" width="360" alt="WA Group Scraper progress banner showing 4 states: looking for members, scrolling, extracted, and done">
+</p>
+
 ## 🚀How to use it?
 1. Open your `"Whatsapp Web"` from a browser: "https://web.whatsapp.com/"
 2. Select a `Whatsapp Group`

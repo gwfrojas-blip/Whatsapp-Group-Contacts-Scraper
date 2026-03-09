@@ -42,19 +42,55 @@
     return 'Unknown_Group';
   }
 
-  // --- Notification banner ---
+  // --- Notification banner with progress bar ---
   const banner = document.createElement('div');
-  banner.style.cssText = 'z-index:9999;background:#006e2b;color:#fff;position:fixed;left:15px;top:15px;width:340px;font-size:14px;padding:10px 14px;border:3px solid #25D366;border-radius:8px;line-height:22px;box-shadow:0 4px 12px rgba(0,0,0,0.3);font-family:sans-serif;';
-  banner.textContent = '🟢 WA Group Scraper: Starting...';
+  banner.style.cssText = [
+    'z-index:9999',
+    'background:#111b21',
+    'color:#e9edef',
+    'position:fixed',
+    'left:16px',
+    'top:16px',
+    'width:320px',
+    'font-size:13px',
+    'padding:12px 14px 10px',
+    'border:1.5px solid #25D366',
+    'border-radius:10px',
+    'line-height:20px',
+    'box-shadow:0 4px 20px rgba(0,0,0,0.5)',
+    'font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif',
+  ].join(';');
+
+  banner.innerHTML = `
+    <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px">
+      <span style="font-size:18px">💬</span>
+      <span style="font-weight:600;font-size:13px;color:#25D366;letter-spacing:0.3px">WA Group Scraper</span>
+    </div>
+    <div id="waScraper_msg" style="color:#e9edef;margin-bottom:10px;font-size:12px">Starting...</div>
+    <div style="background:#2a3942;border-radius:4px;height:6px;overflow:hidden">
+      <div id="waScraper_bar" style="height:100%;width:0%;background:#25D366;border-radius:4px;transition:width 0.4s ease"></div>
+    </div>
+    <div style="display:flex;justify-content:space-between;margin-top:5px;font-size:11px;color:#8696a0">
+      <span id="waScraper_sub">Initialising</span>
+      <span id="waScraper_pct">0%</span>
+    </div>
+  `;
   document.body.appendChild(banner);
 
-  function updateBanner(msg) {
-    banner.textContent = '🟢 WA Scraper: ' + msg;
-    console.log('🟢 ' + msg);
+  function updateBanner(msg, pct, sub) {
+    const msgEl  = document.getElementById('waScraper_msg');
+    const barEl  = document.getElementById('waScraper_bar');
+    const subEl  = document.getElementById('waScraper_sub');
+    const pctEl  = document.getElementById('waScraper_pct');
+    if (msgEl) msgEl.textContent = msg;
+    if (barEl && pct !== undefined) barEl.style.width = pct + '%';
+    if (subEl && sub !== undefined) subEl.textContent = sub;
+    if (pctEl && pct !== undefined) pctEl.textContent = pct + '%';
+    console.log('🟢 [WA Scraper] ' + msg);
   }
 
   // --- Step 1: Check if the members modal is open ---
-  updateBanner('Step 1: Looking for members list...');
+  updateBanner('Looking for members list...', 5, 'Step 1 of 4');
 
   // WhatsApp shows members in a dialog with role="listitem" children
   // The scroll container is a specific child of data-animate-modal-popup
@@ -110,7 +146,7 @@
     return;
   }
 
-  updateBanner(`Found ${memberRows.length} visible members. Scrolling to load all...`);
+  updateBanner(`Found ${memberRows.length} visible members — scrolling to load all...`, 15, 'Step 2 of 4 · Loading');
 
   // --- Step 2: Scroll through the list to load all members (virtual scrolling) ---
   // WhatsApp only renders members visible in the viewport.
@@ -245,14 +281,15 @@
 
     scrollRound++;
     if (scrollRound % 10 === 0) {
-      updateBanner(`Scrolling... ${contacts.size} contacts found (round ${scrollRound})`);
+      const scrollPct = Math.min(15 + Math.round((scrollRound / 300) * 65), 80);
+      updateBanner(`${contacts.size} contacts found so far...`, scrollPct, `Step 2 of 4 · Scroll ${scrollRound}`);
     }
   }
 
   // Final extraction pass
   extractVisibleMembers();
 
-  updateBanner(`Extraction complete: ${contacts.size} contacts found!`);
+  updateBanner(`Extracted ${contacts.size} contacts!`, 85, 'Step 3 of 4 · Extracted');
 
   if (contacts.size === 0) {
     banner.style.backgroundColor = '#c62828';
@@ -262,7 +299,7 @@
   }
 
   // --- Step 3: Generate CSV ---
-  updateBanner(`Generating CSV for ${contacts.size} contacts...`);
+  updateBanner(`Generating CSV for ${contacts.size} contacts...`, 90, 'Step 4 of 4 · Building CSV');
 
   const groupName = getGroupName();
   const arrData = Array.from(contacts.values());
@@ -306,8 +343,11 @@
 
   // --- Summary ---
   const savedContacts = arrData.filter(c => c.namenum === 'IN_CONTACTS').length;
-  const summaryMsg = `Done! ${arrData.length} contacts → ${fileName}`;
-  updateBanner(summaryMsg);
+  updateBanner(
+    `✅ Done! ${arrData.length} contacts saved`,
+    100,
+    `${savedContacts} in contacts · ${arrData.length - savedContacts} unsaved`
+  );
 
   console.log('\n📥 Downloaded: ' + fileName);
   console.log('📊 Summary:');
